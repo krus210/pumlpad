@@ -1,5 +1,7 @@
 # Pumlpad
 
+[![CI](https://github.com/krus210/pumlpad/actions/workflows/ci.yml/badge.svg)](https://github.com/krus210/pumlpad/actions/workflows/ci.yml)
+
 A free, open-source PlantUML editor for macOS. Native, offline and fast: write on the left, see the diagram on the right as you type.
 
 ![Pumlpad: typing with live preview, an error and its fix, keyword completion, zoom, PNG export, C4 and several diagrams in tabs](docs/demo.gif)
@@ -53,6 +55,8 @@ App Store data from 2026-09-30, with the sources in [docs/research.md](docs/rese
 
 The download needs macOS 14 or later on Apple Silicon. Java and PlantUML are inside. [Graphviz](https://graphviz.org) is optional (`brew install graphviz`): without it PlantUML lays out class and component diagrams with its built-in Smetana engine.
 
+From 0.1.2 on, GitHub Actions builds the downloads from the release's tag. To check that a zip is the one it built: `gh attestation verify Pumlpad.zip -R krus210/pumlpad`.
+
 ### Build from source
 
 Needs the Command Line Tools with Swift 6 (`xcode-select --install`); Xcode is not used.
@@ -74,6 +78,8 @@ A PlantUML file is a small program: by default PlantUML lets a diagram read any 
 - **Local files per folder.** Diagram › Allow Local Files asks once per folder and then switches that folder to PlantUML's `ALLOWLIST` profile, still without network access. PlantUML compares paths as written, so a diagram in a trusted folder can reach other files through `../`: trust only folders whose diagrams you trust. Your home folder, Downloads and the folders above home cannot be trusted. Diagram › Trusted Folders lists the folders and revokes trust.
 - **The preview runs nothing from the diagram.** A Content Security Policy lets only the page's own script run and loads nothing from the network; inline styles are allowed, because PlantUML's SVG uses them, and styles cannot run code. Only a click on a diagram link opens the browser.
 - **PlantUML gets a minimal environment**, without `JAVA_TOOL_OPTIONS`, `PLANTUML_*` or other variables, and its own process group: stopping it also stops the Graphviz it started. PlantUML stops when you close the last window of a folder and when the app quits, also on `kill` or Ctrl-C.
+
+Found a way around any of this? Please report it privately, as [SECURITY.md](SECURITY.md) describes.
 
 ## How it works
 
@@ -101,6 +107,8 @@ make install       # copy to ~/Applications and register the file types
 make keywords      # regenerate the completion keywords from PlantUML
 scripts/record-demo.sh  # record docs/demo.gif; DRY_RUN=1 plays it in the background without recording
 ```
+
+CI runs the tests and builds the app on every push and pull request. To release, set `CFBundleShortVersionString` in `Resources/Info.plist`, then push a tag with the same version (`git tag v0.1.2 && git push origin v0.1.2`): the Release workflow builds the standalone app, attests the zip and publishes it.
 
 ## Roadmap
 

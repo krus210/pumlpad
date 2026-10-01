@@ -1,0 +1,15 @@
+name: Idea
+description: Something Pumlpad could do.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What you would like
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: What it is for
+      description: The diagram or the work where you would use it.

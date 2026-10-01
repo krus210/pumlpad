@@ -1,0 +1,35 @@
+# Engine tests, including renders with the pinned PlantUML, and a build of the app.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Download the pinned PlantUML
+        run: make plantuml
+      - name: Test
+        run: make test
+        env:
+          PUMLPAD_JAVA: ${{ env.JAVA_HOME }}/bin/java
+      - name: Build the app
+        run: make app

@@ -124,7 +124,8 @@ import Testing
         let block = try #require(DiagramSource.block(in: document, caretLine: Line(index: 10_000)))
         let elapsed = clock.now - start
         #expect(block.startLine == Line(index: 0))
-        // Splitting into Characters took ~400 ms here; the byte scan takes a few, even unoptimised.
-        #expect(elapsed < .milliseconds(100), "took \(elapsed)")
+        // Splitting into Characters took ~400 ms here; the byte scan takes ~40 ms in a debug build
+        // on an M2 Pro. The limit leaves room for slower CI machines.
+        #expect(elapsed < .milliseconds(250), "took \(elapsed)")
     }
 }
