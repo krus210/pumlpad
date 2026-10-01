@@ -3,7 +3,10 @@
 #
 # STANDALONE=1 also puts PlantUML and a trimmed Java runtime inside the app, so it runs on a Mac
 # without Java or PlantUML: the MIT build of PlantUML (scripts/fetch-plantuml.sh, or PLANTUML_JAR)
-# and a runtime linked from the JDK at JDK_HOME (default: Homebrew's openjdk).
+# and a runtime linked from the JDK at JDK_HOME (default: the newest Java 21 or later that
+# /usr/libexec/java_home knows). That JDK must carry its own native libraries, as Eclipse Temurin
+# does: Homebrew's openjdk links Homebrew's freetype and harfbuzz, and a runtime made from it
+# cannot draw text on a Mac without Homebrew. The build checks for that.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
@@ -21,7 +24,7 @@ cp "$root/Resources/AppIcon.icns" "$root/Resources/Credits.html" "$app/Contents/
 
 if [[ "${STANDALONE:-0}" == 1 ]]; then
   jar="${PLANTUML_JAR:-$("$root/scripts/fetch-plantuml.sh")}"
-  jdk="${JDK_HOME:-/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home}"
+  jdk="${JDK_HOME:-$(/usr/libexec/java_home -v 21+)}"
   runtime="$app/Contents/Resources/jre"
   cp "$jar" "$app/Contents/Resources/plantuml.jar"
   # The modules PlantUML needs for SVG, PNG and the standard library (docs/research.md, 2e).
@@ -29,6 +32,19 @@ if [[ "${STANDALONE:-0}" == 1 ]]; then
     --add-modules java.base,java.compiler,java.desktop,java.logging,java.prefs,java.scripting,jdk.unsupported \
     --strip-debug --no-header-files --no-man-pages --compress=zip-6 \
     --output "$runtime"
+
+  # Every library the runtime loads must come with macOS or with the runtime itself.
+  foreign="$(find "$runtime" -type f | while read -r file; do
+    file -b "$file" | grep -q "Mach-O" || continue
+    otool -L "$file" | tail -n +2 | awk '{ print $1 }' \
+      | grep -vE '^(/usr/lib/|/System/|@rpath/|@loader_path/|@executable_path/)' | sed "s|^|${file#"$runtime"/}: |"
+  done)"
+  if [[ -n "$foreign" ]]; then
+    echo "The runtime from $jdk needs libraries that Macs do not have:" >&2
+    echo "$foreign" >&2
+    echo "Use a JDK that carries its own, such as Eclipse Temurin: JDK_HOME=<its Contents/Home> $0" >&2
+    exit 1
+  fi
 
   # Licences of everything inside (THIRD-PARTY-NOTICES.md); the runtime keeps its own in jre/legal.
   licenses="$app/Contents/Resources/Licenses"

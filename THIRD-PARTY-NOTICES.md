@@ -10,7 +10,7 @@ The standalone app (`make app-standalone` and the release downloads) also carrie
 | Smetana, the Java port of Graphviz `dot` | part of PlantUML | EPL-1.0, © AT&T | inside `plantuml.jar` | the same sources jar |
 | ditaa | part of PlantUML | LGPL-3.0-or-later, © Efstathios Sideris | inside `plantuml.jar` | the same sources jar |
 | PlantUML standard library (C4-PlantUML and others) | part of PlantUML | per library, listed in `PlantUML-license.txt` | inside `plantuml.jar` | [plantuml-stdlib](https://github.com/plantuml/plantuml-stdlib) |
-| OpenJDK runtime, trimmed with `jlink` | 25.0.2 | GPL-2.0 with Classpath Exception | `Contents/Resources/jre` | [openjdk.org](https://openjdk.org); notices in `Contents/Resources/jre/legal` |
+| Eclipse Temurin (OpenJDK) runtime, trimmed with `jlink`, with the FreeType, HarfBuzz and other libraries it carries | 21.0.12.1 | GPL-2.0 with Classpath Exception; those libraries under their own licences | `Contents/Resources/jre` | [adoptium.net](https://adoptium.net), [openjdk.org](https://openjdk.org); notices in `Contents/Resources/jre/legal` |
 
 - `PlantUML-license.txt` inside the app is PlantUML's own notice, printed by `java -jar plantuml.jar -license` at build time.
 - `plantuml.jar` stays a separate file: you can replace it with another PlantUML build.

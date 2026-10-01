@@ -12,7 +12,7 @@ Pumlpad runs the real [PlantUML](https://plantuml.com) on your Mac, with no serv
 - **Offline and private.** Diagrams never leave your Mac. Most PlantUML apps send them to plantuml.com or another server.
 - **The real PlantUML**, not a look-alike that draws a few diagram types: its diagrams, its standard library (C4, AWS, Kubernetes icons…) and its themes, all working offline.
 - **Fast.** The first diagram is on screen about a second after launch; after that each edit renders in milliseconds ([benchmarks](docs/benchmarks.md)).
-- **Native and small.** Swift and AppKit, no Electron. 63 MB with Java and PlantUML inside, 1.3 MB if you already have them.
+- **Native and small.** Swift and AppKit, no Electron. 68 MB with Java and PlantUML inside (a 47 MB download), 1.3 MB if you already have them.
 - **Safe with downloaded files.** A `.puml` file from the internet cannot read your files or reach the network ([security](#security)).
 
 ## Features
@@ -36,7 +36,7 @@ Pumlpad runs the real [PlantUML](https://plantuml.com) on your Mac, with no serv
 | Works offline | **yes** | yes | yes | with a separate local server | no |
 | Diagram types | PlantUML's, except ditaa and chronology | PlantUML's of 2023 | 8 | PlantUML's | PlantUML's |
 | Last update | 2026 | 2023-08-26 | 2026-03-30 | 2026-07-28 | 2026-06-04 |
-| Download size | 63 MB | 117.8 MB | 1.4 MB | 23.3 MB | 0.4 MB |
+| Size | 68 MB | 117.8 MB | 1.4 MB | 23.3 MB | 0.4 MB |
 
 App Store data from 2026-09-30, with the sources in [docs/research.md](docs/research.md), section 1 (in Russian). EasyPlantUML says it needs no Java or server, and its release notes name the PlantUML version it was updated to. VUML draws sequence, class, component, state, activity, use case, ArchiMate and WBS diagrams, on Apple Silicon only.
 
@@ -60,11 +60,11 @@ Needs the Command Line Tools with Swift 6 (`xcode-select --install`); Xcode is n
 ```sh
 git clone https://github.com/krus210/pumlpad.git
 cd pumlpad
-make app-standalone   # PlantUML and a Java runtime inside; needs `brew install openjdk`
+make app-standalone   # PlantUML and a Java runtime inside
 open build/Pumlpad.app
 ```
 
-`make app-standalone` downloads the MIT build of PlantUML at a pinned version and checks its SHA-256. `make app` builds a 1.3 MB app that uses Homebrew's PlantUML and Java instead (`brew install plantuml`); `PUMLPAD_PLANTUML_JAR`, `PUMLPAD_JAVA` and `GRAPHVIZ_DOT` point it elsewhere.
+`make app-standalone` downloads the MIT build of PlantUML at a pinned version and checks its SHA-256. It makes the Java runtime from a JDK 21 or later that carries its own native libraries, such as [Eclipse Temurin](https://adoptium.net) (`brew install --cask temurin@21`); set `JDK_HOME` to pick one. Homebrew's `openjdk` does not work here: it uses Homebrew's font libraries, and the app would draw no text on a Mac without Homebrew. The build checks for that. `make app` builds a 1.3 MB app that uses Homebrew's PlantUML and Java instead (`brew install plantuml`); `PUMLPAD_PLANTUML_JAR`, `PUMLPAD_JAVA` and `GRAPHVIZ_DOT` point it elsewhere.
 
 ## Security
 
@@ -77,7 +77,7 @@ A PlantUML file is a small program: by default PlantUML lets a diagram read any 
 
 ## How it works
 
-Starting Java takes 0.6–1.2 s, so running `plantuml` for every change makes a slow preview. Pumlpad starts `java -jar plantuml.jar -pipe` once and writes each version of the diagram to it; a running PlantUML answers in milliseconds ([benchmarks](docs/benchmarks.md)). Errors come back as `-stdrpt:2` reports with the file and line.
+Starting Java takes 0.6–1.3 s, so running `plantuml` for every change makes a slow preview. Pumlpad starts `java -jar plantuml.jar -pipe` once and writes each version of the diagram to it; a running PlantUML answers in milliseconds ([benchmarks](docs/benchmarks.md)). Errors come back as `-stdrpt:2` reports with the file and line.
 
 - `Sources/PumlCore`: finding the diagram to render, the PlantUML processes, error reports, file encodings. Foundation only, covered by tests that also run the real PlantUML.
 - `Sources/Pumlpad`: the AppKit app. `NSDocument` for files, `NSTextView` for the editor, `WKWebView` for the preview.
@@ -111,6 +111,6 @@ scripts/record-demo.sh  # record docs/demo.gif; DRY_RUN=1 plays it in the backgr
 
 ## License
 
-Pumlpad is under the [MIT License](LICENSE). The download also carries PlantUML (MIT build) and an OpenJDK runtime (GPL-2.0 with Classpath Exception), unmodified; see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). PlantUML's licence does not cover the diagrams you make with it.
+Pumlpad is under the [MIT License](LICENSE). The download also carries PlantUML (MIT build) and an Eclipse Temurin (OpenJDK) runtime (GPL-2.0 with Classpath Exception), unmodified; see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). PlantUML's licence does not cover the diagrams you make with it.
 
 Diagrams are drawn by [PlantUML](https://plantuml.com), by Arnaud Roques and contributors.
