@@ -42,20 +42,33 @@ Pumlpad runs the real [PlantUML](https://plantuml.com) on your Mac, with no serv
 
 App Store data from 2026-09-30, with the sources in [docs/research.md](docs/research.md), section 1 (in Russian). EasyPlantUML says it needs no Java or server, and its release notes name the PlantUML version it was updated to. VUML draws sequence, class, component, state, activity, use case, ArchiMate and WBS diagrams, on Apple Silicon only.
 
+## Compared with open-source tools
+
+| | Pumlpad | [PlantUML for VS Code](https://github.com/qjebbs/vscode-plantuml) | [PlantUML Server](https://github.com/plantuml/plantuml-server) and [editor.plantuml.com](https://editor.plantuml.com/) | [`plantuml -gui`](https://plantuml.com/gui) |
+|---|---|---|---|---|
+| What it is | a Mac app | an extension for VS Code | a web editor, public or in your own Docker | a window that watches a folder |
+| Editor | its own | VS Code | in the browser | none: it shows the pictures of files you edit elsewhere |
+| To install | one download | VS Code, then Java and Graphviz, or a PlantUML server | nothing for the public one, Docker for your own | Java and `plantuml.jar` |
+| Diagrams stay on your computer | **yes** | with the local render or your own server | on your own server only | yes |
+| Files from the internet | cannot read your files or reach the network | PlantUML's defaults | the server's settings | PlantUML's defaults |
+| Runs on | macOS | macOS, Windows, Linux | any browser | anywhere Java runs |
+
+If your diagrams live next to code you edit in VS Code or IntelliJ, and Java is already set up there, an extension is the better fit: it stays in your editor and works on every platform. Pumlpad is for opening a `.puml` file with a double click and seeing it at once, with nothing to set up. There are also editors that let you change a diagram with the mouse, such as Ericsson's [PlantUML Interactive Editor](https://github.com/Ericsson/PlantUML-Interactive-Editor); Pumlpad edits text only.
+
 ## Install
 
 ### Download
 
-1. Download `Pumlpad.zip` from [Releases](https://github.com/krus210/pumlpad/releases), unzip it and move Pumlpad to Applications.
+1. Download `Pumlpad-apple-silicon.zip` or, for a Mac with an Intel processor, `Pumlpad-intel.zip` from [Releases](https://github.com/krus210/pumlpad/releases), unzip it and move Pumlpad to Applications.
 2. Pumlpad is not notarized by Apple (that needs a paid developer account), so macOS blocks the first launch. Open **System Settings › Privacy & Security**, find the message about Pumlpad and click **Open Anyway**. Or run once in Terminal:
 
    ```sh
    xattr -dr com.apple.quarantine /Applications/Pumlpad.app
    ```
 
-The download needs macOS 14 or later on Apple Silicon. Java and PlantUML are inside. [Graphviz](https://graphviz.org) is optional (`brew install graphviz`): without it PlantUML lays out class and component diagrams with its built-in Smetana engine.
+The download needs macOS 14 or later. Java and PlantUML are inside. [Graphviz](https://graphviz.org) is optional (`brew install graphviz`): without it PlantUML lays out class and component diagrams with its built-in Smetana engine.
 
-From 0.1.2 on, GitHub Actions builds the downloads from the release's tag. To check that a zip is the one it built: `gh attestation verify Pumlpad.zip -R krus210/pumlpad`.
+From 0.1.2 on, GitHub Actions builds the downloads from the release's tag. To check that a zip is the one it built: `gh attestation verify Pumlpad-apple-silicon.zip -R krus210/pumlpad`.
 
 ### Build from source
 
@@ -115,7 +128,6 @@ CI runs the tests and builds the app on every push and pull request. To release,
 - Developer ID signing and notarization.
 - A Quick Look preview for `.puml` files.
 - An operating-system sandbox around PlantUML, so that trusted folders cannot be left through `../`.
-- An Intel build of the download.
 
 ## License
 

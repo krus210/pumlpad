@@ -7,14 +7,18 @@
 # /usr/libexec/java_home knows). That JDK must carry its own native libraries, as Eclipse Temurin
 # does: Homebrew's openjdk links Homebrew's freetype and harfbuzz, and a runtime made from it
 # cannot draw text on a Mac without Homebrew. The build checks for that.
+#
+# ARCH=x86_64 builds for Intel Macs on Apple Silicon (and ARCH=arm64 the other way). A standalone
+# build then needs a JDK of that architecture at JDK_HOME, and Rosetta to run its jlink and java.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
 configuration="${CONFIGURATION:-release}"
+arch="${ARCH:-$(uname -m)}"
 app="$root/build/Pumlpad.app"
 
-swift build --package-path "$root" -c "$configuration" --product Pumlpad
-bin="$(swift build --package-path "$root" -c "$configuration" --show-bin-path)"
+swift build --package-path "$root" -c "$configuration" --arch "$arch" --product Pumlpad
+bin="$(swift build --package-path "$root" -c "$configuration" --arch "$arch" --show-bin-path)"
 
 rm -rf "$app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
@@ -25,6 +29,10 @@ cp "$root/Resources/AppIcon.icns" "$root/Resources/Credits.html" "$app/Contents/
 if [[ "${STANDALONE:-0}" == 1 ]]; then
   jar="${PLANTUML_JAR:-$("$root/scripts/fetch-plantuml.sh")}"
   jdk="${JDK_HOME:-$(/usr/libexec/java_home -v 21+)}"
+  if ! lipo -archs "$jdk/bin/java" | grep -qw "$arch"; then
+    echo "The JDK at $jdk is not built for $arch: JDK_HOME=<a JDK for $arch> $0" >&2
+    exit 1
+  fi
   runtime="$app/Contents/Resources/jre"
   cp "$jar" "$app/Contents/Resources/plantuml.jar"
   # The modules PlantUML needs for SVG, PNG and the standard library (docs/research.md, 2e).
