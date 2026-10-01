@@ -1,0 +1,6 @@
+@startuml
+title Checkout
+actor Customer
+participant Shop
+Customer -> Shop : Place order
+@enduml

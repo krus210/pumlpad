@@ -1,0 +1,28 @@
+@startuml
+!include <C4/C4_Container>
+
+LAYOUT_TOP_DOWN()
+
+title Online shop — C4 containers
+
+Person(customer, "Customer", "Buys products in the browser")
+
+System_Boundary(shop, "Online shop") {
+  Container(web, "Web app", "TypeScript, React", "Catalogue, cart and checkout")
+  Container(api, "API", "Go", "Orders, prices and stock")
+  ContainerDb(db, "Database", "PostgreSQL", "Orders and products")
+  ContainerQueue(events, "Events", "Kafka", "Order events")
+}
+
+System_Ext(payments, "Payment provider", "Charges cards")
+System_Ext(mail, "Mail service", "Sends receipts")
+
+Rel(customer, web, "Uses", "HTTPS")
+Rel(web, api, "Calls", "JSON/HTTPS")
+Rel(api, db, "Reads and writes", "SQL")
+Rel(api, payments, "Charges", "HTTPS")
+Rel(api, events, "Publishes", "order.paid")
+Rel(events, mail, "Triggers receipt")
+
+SHOW_LEGEND()
+@enduml

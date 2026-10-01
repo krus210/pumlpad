@@ -1,0 +1,24 @@
+@startuml
+title Checkout — sequence
+
+actor Customer
+participant "Web Shop" as Shop
+participant "Payment API" as Pay
+database Orders
+
+Customer -> Shop : Place order
+activate Shop
+Shop -> Orders : INSERT order (status = new)
+Shop -> Pay : Charge card
+activate Pay
+alt payment accepted
+  Pay --> Shop : 200 OK
+  Shop -> Orders : UPDATE status = paid
+  Shop --> Customer : Order confirmed
+else payment declined
+  Pay --> Shop : 402 Declined
+  Shop --> Customer : Try another card
+end
+deactivate Pay
+deactivate Shop
+@enduml

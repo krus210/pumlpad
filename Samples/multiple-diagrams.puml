@@ -1,0 +1,26 @@
+' Several diagrams in one file: the preview shows the one under the caret.
+
+@startuml
+class Order {
+  +id: UUID
+  +total: Money
+  +pay()
+}
+class Customer
+class LineItem
+Customer "1" -- "*" Order
+Order *-- "1..*" LineItem
+@enduml
+
+@startmindmap
+* Pumlpad
+** Editor
+*** Highlighting
+*** Line numbers
+** Preview
+*** Zoom and pan
+*** Error marker
+** Export
+*** PNG
+*** SVG
+@endmindmap
